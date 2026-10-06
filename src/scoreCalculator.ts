@@ -1,22 +1,24 @@
 import type { Evaluation } from './DatabaseService';
 
-// Define the domain IDs to match those in App.tsx
+// Define the domain IDs to match the NEW 8 STUDENT DOMAINS in App.tsx
 const DOMAIN_IDS = [
-  'learning-environment',
-  'teaching-learning',
-  'student-engagement',
-  'assessment-progress',
-  'curriculum-professionalism',
-  'resources-technology'
+  'participation-engagement',
+  'understanding-learning',
+  'thinking-problem-solving',
+  'independent-learning',
+  'collaboration-communication',
+  'behaviour-conduct',
+  'homework-assignments',
+  'habits-progress'
 ];
 
 /**
  * Calculates the domain score for a given domain based on its ratings
  * @param ratings - The ratings object containing indicator ratings
  * @param domainId - The ID of the domain to calculate score for
- * @returns The domain score rounded to 2 decimal places, or null if all indicators are N/O
+ * @returns The domain score rounded to 2 decimal places, or null if no indicators rated
  */
-export function calculateDomainScore(ratings: Record<string, 1 | 2 | 3 | 4 | "N/O">, domainId: string): number | null {
+export function calculateDomainScore(ratings: Record<string, 1 | 2 | 3 | 4>, domainId: string): number | null {
   // Find all indicators for this domain
   const domainIndicators = Object.keys(ratings).filter(key => key.startsWith(`${domainId}-`));
   
@@ -24,27 +26,26 @@ export function calculateDomainScore(ratings: Record<string, 1 | 2 | 3 | 4 | "N/
     return null; // No ratings for this domain
   }
 
-  // Calculate sum of numeric ratings and count of observed indicators
+  // Calculate sum of ratings and count of rated indicators
   let sum = 0;
-  let observedCount = 0;
+  let ratedCount = 0;
 
   for (const indicatorKey of domainIndicators) {
     const rating = ratings[indicatorKey];
     
     if (typeof rating === 'number') {
       sum += rating;
-      observedCount++;
+      ratedCount++;
     }
-    // Skip "N/O" ratings
   }
 
-  // If no observed indicators, return null
-  if (observedCount === 0) {
+  // If no rated indicators, return null
+  if (ratedCount === 0) {
     return null;
   }
 
   // Calculate average and round to 2 decimal places
-  const average = sum / observedCount;
+  const average = sum / ratedCount;
   return Math.round(average * 100) / 100;
 }
 

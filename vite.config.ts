@@ -10,11 +10,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
-        navigateFallback: '/EvalFlow/index.html'
+        navigateFallback: '/EvalView/index.html'
       },
       manifest: {
-        name: 'EvalFlow - Teacher Evaluation System',
-        short_name: 'EvalFlow',
+        name: 'EvalView - Student Evaluation PWA',
+        short_name: 'EvalView',
         description: 'Offline-first Teacher Evaluation Application',
         start_url: '/',
         display: 'standalone',
@@ -49,5 +49,5 @@ export default defineConfig({
       }
     })
   ],
-  base: '/EvalFlow/',
+  base: '/EvalView/',
 })

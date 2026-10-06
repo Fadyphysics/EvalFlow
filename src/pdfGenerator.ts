@@ -2,60 +2,78 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { Evaluation } from './DatabaseService';
 
-// Define the evaluation structure
+// Define the NEW 8 STUDENT EVALUATION DOMAINS WITH 3 INDICATORS EACH
 const evaluationDomains = [
   {
-    id: 'learning-environment',
-    name: 'Learning Environment',
+    id: 'participation-engagement',
+    name: 'Participation & Engagement',
     indicators: [
-      'Creates a positive and inclusive classroom environment.',
-      'Establishes clear routines and expectations.',
-      'Manages behavior and instructional time effectively.'
+      'Actively participates in class discussions and activities.',
+      'Shows interest and enthusiasm for learning.',
+      'Remains focused and attentive during lessons.'
     ]
   },
   {
-    id: 'teaching-learning',
-    name: 'Teaching & Learning',
+    id: 'understanding-learning',
+    name: 'Understanding & Learning',
     indicators: [
-      'Lesson objectives/explanations are clear.',
-      'Uses effective teaching strategies and questioning.',
-      'Demonstrates strong subject knowledge.'
+      'Demonstrates good comprehension of concepts taught.',
+      'Applies knowledge to new situations effectively.',
+      'Asks thoughtful questions to deepen understanding.'
     ]
   },
   {
-    id: 'student-engagement',
-    name: 'Student Engagement',
+    id: 'thinking-problem-solving',
+    name: 'Thinking & Problem Solving',
     indicators: [
-      'Students are actively involved in learning.',
-      'Students have opportunities to think, question, discuss, or collaborate.',
-      'Students demonstrate appropriate independence in learning.'
+      'Thinks critically and analytically.',
+      'Approaches problems with creativity and logic.',
+      'Works through challenges independently.'
     ]
   },
   {
-    id: 'assessment-progress',
-    name: 'Assessment & Student Progress',
+    id: 'independent-learning',
+    name: 'Independent Learning',
     indicators: [
-      'Checks student understanding during the lesson.',
-      'Provides useful feedback.',
-      'Responds appropriately to student needs and understanding.'
+      'Completes tasks without constant supervision.',
+      'Takes initiative in learning activities.',
+      'Self-regulates learning behaviors effectively.'
     ]
   },
   {
-    id: 'curriculum-professionalism',
-    name: 'Curriculum & Professionalism',
+    id: 'collaboration-communication',
+    name: 'Collaboration & Communication',
     indicators: [
-      'Lesson activities align with curriculum objectives.',
-      'Teacher demonstrates professional conduct.',
-      'Teacher communicates clearly and professionally.'
+      'Works well with peers in group activities.',
+      'Communicates ideas clearly and respectfully.',
+      'Listens actively to others during discussions.'
     ]
   },
   {
-    id: 'resources-technology',
-    name: 'Resources & Technology',
+    id: 'behaviour-conduct',
+    name: 'Behaviour & Classroom Conduct',
     indicators: [
-      'Uses appropriate instructional resources.',
-      'Uses technology appropriately when relevant.',
-      'Uses classroom/school resources effectively.'
+      'Follows classroom rules and expectations.',
+      'Shows respect to teachers and classmates.',
+      'Handles conflicts appropriately.'
+    ]
+  },
+  {
+    id: 'homework-assignments',
+    name: 'Homework & Assignments',
+    indicators: [
+      'Completes assignments on time consistently.',
+      'Produces quality work that reflects effort.',
+      'Seeks help when facing difficulties with tasks.'
+    ]
+  },
+  {
+    id: 'habits-progress',
+    name: 'Learning Habits & Progress',
+    indicators: [
+      'Demonstrates consistent improvement over time.',
+      'Develops effective study habits and routines.',
+      'Takes responsibility for own learning progress.'
     ]
   }
 ];
@@ -63,9 +81,9 @@ const evaluationDomains = [
 /**
  * Generates a PDF report for an evaluation
  * @param evaluation - The evaluation data to include in the PDF
- * @param teacherName - The name of the teacher being evaluated
+ * @param studentName - The name of the student being evaluated
  */
-export const generateEvaluationPdf = (evaluation: Evaluation, teacherName: string) => {
+export const generateEvaluationPdf = (evaluation: Evaluation, studentName: string) => {
   const doc = new jsPDF();
 
   // Start with initial Y position
@@ -74,7 +92,7 @@ export const generateEvaluationPdf = (evaluation: Evaluation, teacherName: strin
   // Header section - compact design
   doc.setFontSize(18);
   doc.setTextColor(15, 23, 42); // Dark blue color
-  doc.text('Teacher Evaluation Report', 20, currentY);
+  doc.text('Student Evaluation Report', 20, currentY);
   currentY += 10;
 
   // Compact meta grid - 3-column layout
@@ -86,7 +104,7 @@ export const generateEvaluationPdf = (evaluation: Evaluation, teacherName: strin
   const rightColumnX = 140;
   
   // First row of metadata
-  doc.text(`Teacher: ${teacherName}`, leftColumnX, currentY);
+  doc.text(`Student: ${studentName}`, leftColumnX, currentY);
   doc.text(`Subject: ${evaluation.subject}`, middleColumnX, currentY);
   doc.text(`Grade: ${evaluation.grade}`, rightColumnX, currentY);
   currentY += 7;
@@ -106,10 +124,10 @@ export const generateEvaluationPdf = (evaluation: Evaluation, teacherName: strin
   // Prepare scores summary table data
   const scoresSummaryData: any[] = [];
   
-  // Split domains into two columns (first 3 and last 3)
-  for (let i = 0; i < 3; i++) {
+  // Process all 8 domains in pairs (first 4 pairs of left/right)
+  for (let i = 0; i < 4; i++) {
     const leftDomain = evaluationDomains[i];
-    const rightDomain = evaluationDomains[i + 3];
+    const rightDomain = evaluationDomains[i + 4];
     
     const leftScore = evaluation.domainScores[leftDomain.id];
     const rightScore = evaluation.domainScores[rightDomain.id];
@@ -301,16 +319,16 @@ export const generateEvaluationPdf = (evaluation: Evaluation, teacherName: strin
     doc.setTextColor(100, 100, 100);
     
     // Bottom Left Branding
-    doc.text("Generated by EvalFlow", 10, pageHeight - 10);
+    doc.text("Generated by EvalView", 10, pageHeight - 10);
     
     // Bottom Right Page Number
     doc.text(`Page ${i} of ${pageCount}`, pageWidth - 10, pageHeight - 10, { align: "right" });
   }
 
-  // Generate filename in the requested format: [TeacherName]_Evaluation_[EvalNumber]_[Date].pdf
-  const sanitizedTeacherName = teacherName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
+  // Generate filename in the requested format: [StudentName]_Evaluation_[EvalNumber]_[Date].pdf
+  const sanitizedStudentName = studentName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_');
   const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-  const fileName = `${sanitizedTeacherName}_Evaluation_${evaluation.evaluationNumber}_${dateStr}.pdf`;
+  const fileName = `${sanitizedStudentName}_Evaluation_${evaluation.evaluationNumber}_${dateStr}.pdf`;
   
   // Save the PDF with the formatted filename
   doc.save(fileName);
